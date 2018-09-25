@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">ReactiveScorecard</string>
+    <string name="scorecard">Scoreboard</string>
+    <string name="playername">Player\'s name</string>
+    <string name="players">Players</string>
+</resources>
