@@ -29,36 +29,14 @@ public class PlayersAdapter extends ListAdapter<Player, PlayersAdapter.ViewHolde
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         RowBinding binding = DataBindingUtil.inflate(inflater, R.layout.row, parent, false);
+        binding.setModel(viewModel);
         return new ViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        Player player = getItem(position);
-
-        viewHolder.binding.setPlayer(player);
-        viewHolder.binding.imgDown.setOnClickListener(view -> updateScore(player, false));
-        viewHolder.binding.imgUp.setOnClickListener(view -> updateScore(player, true));
-        viewHolder.binding.imgDelete.setOnClickListener(view -> deletePlayer(player.getId()));
+        viewHolder.binding.setPlayer(getItem(position));
     }
-
-
-    private void updateScore(Player player, boolean isAdd){
-        player.setScore(isAdd ? (player.getScore()+1) : (player.getScore()-1));
-
-        viewModel.updateScore(player)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> Log.e("Update Player", "Player updation completed"));
-    }
-
-    public void deletePlayer(int playerId){
-        viewModel.deletePlayer(playerId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> Log.e("Delete Player", "Player deletion completed"));
-    }
-
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
 

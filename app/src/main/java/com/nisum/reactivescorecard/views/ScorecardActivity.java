@@ -1,5 +1,6 @@
 package com.nisum.reactivescorecard.views;
 
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
@@ -11,9 +12,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.nisum.reactivescorecard.Injection;
 import com.nisum.reactivescorecard.R;
 import com.nisum.reactivescorecard.databinding.ActivityScorecardBinding;
+import com.nisum.reactivescorecard.di.ContextModule;
+import com.nisum.reactivescorecard.di.DaggerScorecardComponent;
+import com.nisum.reactivescorecard.di.ScorecardComponent;
 import com.nisum.reactivescorecard.persistance.dto.Player;
 import com.nisum.reactivescorecard.adapters.PlayersAdapter;
 import com.nisum.reactivescorecard.viewmodels.PlayerViewModel;
@@ -34,9 +37,6 @@ public class ScorecardActivity extends AppCompatActivity {
     private ViewModelFactory viewModelFactory;
     private PlayerViewModel viewModel;
 
-
-    private final CompositeDisposable mDisposable = new CompositeDisposable();
-
     @BindView(R.id.et_playername)
     EditText etPlayerName;
 
@@ -46,7 +46,6 @@ public class ScorecardActivity extends AppCompatActivity {
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
 
-    private List<Player> players = new ArrayList<>();
     private PlayersAdapter adapter;
 
     private ActivityScorecardBinding binding;
@@ -58,7 +57,12 @@ public class ScorecardActivity extends AppCompatActivity {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_scorecard);
         binder = ButterKnife.bind(this);
-        viewModelFactory = Injection.provideViewModelFactory(this);
+
+        ScorecardComponent component = DaggerScorecardComponent
+                .builder()
+                .contextModule(new ContextModule(this))
+                .build();
+        viewModelFactory = component.getViewModelFactory();
         viewModel        = ViewModelProviders.of(this, viewModelFactory).get(PlayerViewModel.class);
 
         init();
@@ -76,7 +80,6 @@ public class ScorecardActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
-        mDisposable.clear();
         binding.unbind();
         binder.unbind();
     }
@@ -84,29 +87,22 @@ public class ScorecardActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        subscribePlayersList();
+
+        viewModel.subscribePlayersList();
+        viewModel.playersResponse().observe(this, updatedPlayersList -> notifyAdapterWith(updatedPlayersList));
     }
 
-    private void subscribePlayersList(){
-        mDisposable.add(viewModel.getPlayers()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(playersList -> {
-                    List<Player> list = new ArrayList<>();
-                    list.addAll(playersList);
-                    adapter.submitList(list);
-                }, throwable -> Log.e("Get Players", "Unable to retrieve players", throwable)));
+    private void notifyAdapterWith(List<Player> updatedPlayersList){
+        adapter.submitList(updatedPlayersList);
     }
 
-    public void insertPlayer(View view){
-        imgSave.setEnabled(false);
-        mDisposable.add(viewModel.insertPlayer(new Player(etPlayerName.getText().toString(), 0))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                    imgSave.setEnabled(true);
-                    etPlayerName.getText().clear();
-                }, throwable -> Log.e("Insert Player", "Unable to insert Player", throwable))
-        );
+    public void insertPlayer(View view) {
+        if(etPlayerName.getText().toString().length() > 0){
+            viewModel.insertPlayerWith(etPlayerName.getText().toString());
+            etPlayerName.getText().clear();
+        }
+        else{
+            etPlayerName.setError("Required");
+        }
     }
 }
