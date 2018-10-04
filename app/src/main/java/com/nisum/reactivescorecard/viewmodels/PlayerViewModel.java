@@ -3,14 +3,14 @@ package com.nisum.reactivescorecard.viewmodels;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
-import android.view.View;
 
-import com.nisum.reactivescorecard.persistance.PlayerDataSource;
 import com.nisum.reactivescorecard.persistance.dao.IPlayerDataSource;
 import com.nisum.reactivescorecard.persistance.dto.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -24,6 +24,7 @@ public class PlayerViewModel extends ViewModel{
     private final CompositeDisposable mDisposable = new CompositeDisposable();
     MutableLiveData<List<Player>> playersList = new MutableLiveData<>();
 
+    @Inject
     public PlayerViewModel(IPlayerDataSource playerDataSource){
         this.mPlayerDataSource = playerDataSource;
     }

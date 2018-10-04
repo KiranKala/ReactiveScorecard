@@ -6,12 +6,11 @@ import com.nisum.reactivescorecard.persistance.PlayerDataSource;
 import com.nisum.reactivescorecard.persistance.ScoreDB;
 import com.nisum.reactivescorecard.persistance.dao.IPlayer;
 import com.nisum.reactivescorecard.persistance.dao.IPlayerDataSource;
-import com.nisum.reactivescorecard.viewmodels.ViewModelFactory;
 
 import dagger.Module;
 import dagger.Provides;
 
-@Module(includes = ContextModule.class)
+@Module(includes = AppModule.class)
 public class ViewModelFactoryModule {
 
     @Provides
@@ -22,10 +21,5 @@ public class ViewModelFactoryModule {
     @Provides
     public IPlayerDataSource providePlayerDataSource(IPlayer playerDao){
         return new PlayerDataSource(playerDao);
-    }
-
-    @Provides
-    public ViewModelFactory provideViewModelFactory(IPlayerDataSource providePlayerDataSource){
-        return new ViewModelFactory(providePlayerDataSource);
     }
 }

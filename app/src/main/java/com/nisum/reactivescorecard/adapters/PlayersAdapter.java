@@ -4,7 +4,6 @@ import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.recyclerview.extensions.ListAdapter;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -12,9 +11,6 @@ import com.nisum.reactivescorecard.R;
 import com.nisum.reactivescorecard.databinding.RowBinding;
 import com.nisum.reactivescorecard.persistance.dto.Player;
 import com.nisum.reactivescorecard.viewmodels.PlayerViewModel;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 public class PlayersAdapter extends ListAdapter<Player, PlayersAdapter.ViewHolder> {
 
