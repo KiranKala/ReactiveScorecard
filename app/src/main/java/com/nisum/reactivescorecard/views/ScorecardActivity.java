@@ -60,7 +60,6 @@ public class ScorecardActivity extends AppCompatActivity {
     }
 
     private void init(){
-        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new PlayersAdapter(viewModel);
